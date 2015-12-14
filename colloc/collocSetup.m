@@ -9,10 +9,10 @@ maxSpeed = 1.0;
 maxTurn = 4.0;
 
 % initial configuration (x,y,theta)
-initConfig = [0 0 -1*pi/4];
+initConfig = [0 0 2*pi/4];
 
 % final configuration
-termConfig = [1 1 0*pi/4];
+termConfig = [1 1 -1*pi/4];
 
 % convert to z (output) and z-dot form
 initZ = initConfig(:,1:2)';
@@ -29,7 +29,7 @@ nOutput = numel(initZ);
 nElems = 3;
 
 % degree of polynominal = number of colloc points
-nColloc = 4;
+nColloc = 5;
 
 % collocation points - t is generalized time, [-1,1]
 tColloc = cos((0:(nColloc-1))*pi/(nColloc-1));
@@ -122,7 +122,7 @@ if prob.size.nElems>1,
     for ee=2:prob.size.nElems,
         ts = [ts, ((ee-1)+(1+prob.colloc.tColloc)*0.5)];
     end
-    ts = ts/prob.size.nElems
+    ts = ts/prob.size.nElems;
 end
 
 deltaZ = prob.bcs.termZ-prob.bcs.initZ;
