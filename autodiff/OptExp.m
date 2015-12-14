@@ -72,6 +72,16 @@ classdef OptExp
                 self.sens(ind,:));
         end
         
+        function y = div(u,v)
+            % divide two expressions
+            val = (u.vals)./(v.vals);
+            sns = u.sens; % placeholder
+            for kk = 1:numel(val),
+                sns(kk,:) = (v.vals(kk)*u.sens(kk,:) - u.vals(kk)*v.sens(kk,:))/(v.vals(kk)*v.vals(kk));
+            end
+            y = OptExp(val,sns);
+        end
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % trying overloading
         
@@ -82,6 +92,16 @@ classdef OptExp
                 y = mult(obj1,obj2);
             else
                 error('This type of multiplication not supported')
+            end
+        end
+        
+        % a./b
+        function y = rdivide(u,v)
+            % only valid for multiplying two expressions
+            if isa(u,'OptExp')&&isa(v,'OptExp'),
+                y = div(u,v);
+            else
+                error('This type of division not supported')
             end
         end
         
