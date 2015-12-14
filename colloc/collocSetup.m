@@ -108,6 +108,14 @@ prob.size.nColloc = nColloc;
 prob.size.nOutput = nOutput;
 prob.size.nVars = nElems*nColloc*nOutput+1; % extra one for time
 
+%% big sprase matrices for fast extract of values
+prob.mats.bigEval = sparse(kron(eye(prob.size.nElems),prob.colloc.evalMatrix));
+prob.mats.bigDiff = sparse(kron(eye(prob.size.nElems),prob.colloc.diffEvalMatrix));
+prob.mats.bigDblDiff = sparse(kron(eye(prob.size.nElems),prob.colloc.dDiffEvalMatrix));
+% prob.mats.bigEval = (kron(eye(prob.size.nElems),prob.colloc.evalMatrix));
+% prob.mats.bigDiff = (kron(eye(prob.size.nElems),prob.colloc.diffEvalMatrix));
+% prob.mats.bigDblDiff = (kron(eye(prob.size.nElems),prob.colloc.dDiffEvalMatrix));
+
 %% initial guess
 
 % total time

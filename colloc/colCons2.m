@@ -4,10 +4,10 @@ xv = DecVar(x);
 [Co,Ceqo] = colCons(prob,xv);
 
 C=value(Co);
-CG=grad(Co)';
+CG=sparse(grad(Co)');
 
 Ceq=value(Ceqo);
-CGeq=grad(Ceqo)';
+CGeq=sparse(grad(Ceqo)');
 
 % grab
 %C2 = C;

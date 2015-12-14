@@ -10,16 +10,16 @@ ycs = x(2:2:(prob.size.nVars-1));
 t = x(prob.size.nVars);
 
 % get values
-xvals = kron(eye(prob.size.nElems),prob.colloc.evalMatrix)*xcs;
-yvals = kron(eye(prob.size.nElems),prob.colloc.evalMatrix)*ycs;
+xvals = prob.mats.bigEval*xcs;
+yvals = prob.mats.bigEval*ycs;
 
 % get derivatives
-xdots = kron(eye(prob.size.nElems),prob.colloc.diffEvalMatrix)*xcs; % trouble here with "/t"
-ydots = kron(eye(prob.size.nElems),prob.colloc.diffEvalMatrix)*ycs;
+xdots = prob.mats.bigDiff*xcs; % trouble here with "/t"
+ydots = prob.mats.bigDiff*ycs;
 
 % and second derivatives
-xDdots = kron(eye(prob.size.nElems),prob.colloc.dDiffEvalMatrix)*xcs; % trouble here with "/t"
-yDdots = kron(eye(prob.size.nElems),prob.colloc.dDiffEvalMatrix)*ycs;
+xDdots = prob.mats.bigDblDiff*xcs; % trouble here with "/t"
+yDdots = prob.mats.bigDblDiff*ycs;
 
 % speed, squared, w.r.t normalized time
 spdsqs = xdots.*xdots + ydots.*ydots;

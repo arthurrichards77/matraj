@@ -5,10 +5,10 @@ end
 
 prob = collocSetup;
 
-options = optimoptions('fmincon','MaxFunEvals',50000,'MaxIter',10000);
-tic
-[x,Jopt,flag,op] = fmincon(@(x)colCost(prob,x),prob.x0,[],[],[],[],[],[],@(x)colCons(prob,x),options)
-t1 = toc
+% options = optimoptions('fmincon','MaxFunEvals',50000,'MaxIter',10000);
+% tic
+% [x,Jopt,flag,op] = fmincon(@(x)colCost(prob,x),prob.x0,[],[],[],[],[],[],@(x)colCons(prob,x),options)
+% t1 = toc
 
 % version with autodiff expressions
 options = optimoptions('fmincon','MaxFunEvals',50000,'MaxIter',10000,'GradObj','on','GradConstr','on');

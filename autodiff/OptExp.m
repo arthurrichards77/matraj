@@ -7,7 +7,7 @@ classdef OptExp
         % constructor
         function obj = OptExp(vals,sens)
             % need a sensitivity row for every value
-            assert(size(sens,1)==numel(vals))
+            % assert(size(sens,1)==numel(vals))
             obj.vals = vals;
             obj.sens = sens;
         end
