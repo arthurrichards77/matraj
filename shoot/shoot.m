@@ -2,12 +2,7 @@ function [res, xres] = shoot
 
 prob = shootSetup();
 
-UB = repmat([prob.lims.maxSpeed;
-             prob.lims.maxTurn], prob.steps.nSteps, 1);
-LB = repmat([0;
-             -prob.lims.maxTurn], prob.steps.nSteps, 1);
-
-res = fmincon(@(x)shoot1Cost(prob,x),prob.x0,[],[],[],[],LB,UB,@(x)shoot1Cons(prob,x));
+res = fmincon(@(x)shoot1Cost(prob,x),prob.x0,[],[],[],[],prob.LB,prob.UB,@(x)shoot1Cons(prob,x));
 
 xres = shoot1(prob,res);
 
@@ -26,11 +21,16 @@ prob.steps.dt = 0.1;
 prob.lims.maxTurn = 2.0;
 prob.lims.maxSpeed = 4.0;
 
-prob.bcs.xInit = [0;0;-0*pi/3];
-prob.bcs.xTerm = [4.0;0.0;0*pi/6];
+prob.bcs.xInit = [0;0;0*pi/3];
+prob.bcs.xTerm = [2.0;2.0;-5*pi/6];
 
 prob.x0 = repmat([0.5*prob.lims.maxSpeed;
              0*prob.lims.maxTurn], prob.steps.nSteps, 1);
+
+prob.UB = repmat([prob.lims.maxSpeed;
+                  prob.lims.maxTurn], prob.steps.nSteps, 1);
+prob.LB = repmat([ 0;
+                  -prob.lims.maxTurn], prob.steps.nSteps, 1);
 
 end
 
@@ -44,14 +44,15 @@ function [C,Ceq] = shoot1Cons(prob,x)
 
 xs = shoot1(prob,x);
 
+C = [];
+
 % obstacle loc
-xo = [2;0];
-Ro = 0.5;
-ds = [xs(1,:)-xo(1);xs(2,:)-xo(2)];
+%xo = [2;0];
+%Ro = 0.5;
+%ds = [xs(1,:)-xo(1);xs(2,:)-xo(2)];
+%Co = Ro*Ro - sum(ds.*ds)';
+%C = [C; Co];
 
-Co = Ro*Ro - sum(ds.*ds)';
-
-C = [Co];
 Ceq = [xs(1:2,end) - prob.bcs.xTerm(1:2);
        xs(3,end) - prob.bcs.xTerm(3)];
 %       cos(xs(3,end)) - cos(prob.bcs.xTerm(3));
