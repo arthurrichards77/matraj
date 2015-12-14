@@ -138,5 +138,10 @@ classdef OptExp
         function y = vertcat(a,b,varargin)
             y = stackn(a,b,varargin{:});
         end
+        
+        % number of elements
+        function n = numel(self)
+            n = numel(self.vals);
+        end
     end
 end
