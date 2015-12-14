@@ -1,0 +1,2 @@
+# matraj
+Matlab trajectory optimizing
