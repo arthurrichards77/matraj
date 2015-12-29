@@ -11,7 +11,9 @@ prob = collocSetup;
 % t1 = toc
 
 % version with autodiff expressions
-options = optimoptions('fmincon','MaxFunEvals',50000,'MaxIter',10000,'GradObj','on','GradConstr','on');
+options = optimset('fmincon');
+options = optimset(options,'MaxFunEvals',50000,'MaxIter',10000);
+options = optimset(options,'GradObj','on','GradConstr','on');
 %options = optimoptions('fmincon','MaxFunEvals',50000,'MaxIter',10000,'GradObj','on','GradConstr','on','DerivativeCheck','on');
 tic
 [x,Jopt,flag,op] = fmincon(@(x)colCost2(prob,x),prob.x0,[],[],[],[],[],[],@(x)colCons2(prob,x),options)
