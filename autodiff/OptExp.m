@@ -48,7 +48,10 @@ classdef OptExp
         function y = mult(obj1,obj2)
             % multiply two expressions, elementwise
             y = OptExp(obj1.vals.*obj2.vals, ...
-                diag(obj1.vals)*obj2.sens + diag(obj2.vals)*obj1.sens);
+                  diag(obj1.vals)*obj2.sens + diag(obj2.vals)*obj1.sens);
+            %n = numel(obj1.vals);
+            %y = OptExp(obj1.vals.*obj2.vals, ...
+            %    spdiags(obj1.vals,0,n,n)*obj2.sens + spdiags(obj2.vals,0,n,n)*obj1.sens);
         end
         
         function y = stack2(obj1,obj2)
