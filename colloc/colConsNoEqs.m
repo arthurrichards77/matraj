@@ -10,8 +10,8 @@ ycs = x(2:2:(prob.size.nVars-1));
 t = x(prob.size.nVars);
 
 % get values
-xvals = prob.mats.bigEval*xcs;
-yvals = prob.mats.bigEval*ycs;
+%xvals = prob.mats.bigEval*xcs;
+%yvals = prob.mats.bigEval*ycs;
 
 % get derivatives
 xdots = prob.mats.bigDiff*xcs; % trouble here with "/t"
