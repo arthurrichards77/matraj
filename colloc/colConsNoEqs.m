@@ -31,8 +31,10 @@ C_spd = spdsqs - (0.25*prob.lims.maxSpeed*prob.lims.maxSpeed*ones(numel(spdsqs),
 % NOTE - this experession is VERY sensitive to numerical issues.  Don't try
 % and re-arrange to get rid of the divide.
 crv1 = (xdots.*yDdots - ydots.*xDdots);
-crv2 = crv1.*crv1;
-crv3 = spdsqs.*spdsqs.*spdsqs;
+crv2 = crv1.*crv1; % this one makes little difference by power or by multiply
+%crv2 = crv1.^2;
+%crv3 = spdsqs.*spdsqs.*spdsqs;
+crv3 = spdsqs.^3; % much faster done as a power
 C_crv = (crv2./crv3) - (prob.lims.maxTurn*prob.lims.maxTurn);
 
 % compile ineqs

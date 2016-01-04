@@ -85,8 +85,21 @@ classdef OptExp
             y = OptExp(val,sns);
         end
         
+        function y = mypower(u,n)
+            % raise expression to power
+            % assumed elementwise
+            y = OptExp((u.vals).^n, ...
+                  n*diag((u.vals).^(n-1))*u.sens);
+        end
+            
+        
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % trying overloading
+        
+        % a.^n
+        function y = power(u,n)
+            y = mypower(u,n);
+        end
         
         % a.*b
         function y = times(obj1,obj2)
