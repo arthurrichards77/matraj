@@ -9,10 +9,10 @@ maxSpeed = 1.0;
 maxTurn = 3.0;
 
 % initial configuration (x,y,theta)
-initConfig = [0 0 -2*pi/4];
+initConfig = [0 0 -2*0*pi/4];
 
 % final configuration
-termConfig = [1 1 1*pi/4];
+termConfig = [1 1 1*0*pi/4];
 
 % convert to z (output) and z-dot form
 initZ = initConfig(:,1:2)';
@@ -108,13 +108,20 @@ prob.size.nColloc = nColloc;
 prob.size.nOutput = nOutput;
 prob.size.nVars = nElems*nColloc*nOutput+1; % extra one for time
 
-%% big sprase matrices for fast extract of values
+%% big sparse matrices for fast extract of values
 prob.mats.bigEval = sparse(kron(eye(prob.size.nElems),prob.colloc.evalMatrix));
 prob.mats.bigDiff = sparse(kron(eye(prob.size.nElems),prob.colloc.diffEvalMatrix));
 prob.mats.bigDblDiff = sparse(kron(eye(prob.size.nElems),prob.colloc.dDiffEvalMatrix));
 % prob.mats.bigEval = (kron(eye(prob.size.nElems),prob.colloc.evalMatrix));
 % prob.mats.bigDiff = (kron(eye(prob.size.nElems),prob.colloc.diffEvalMatrix));
 % prob.mats.bigDblDiff = (kron(eye(prob.size.nElems),prob.colloc.dDiffEvalMatrix));
+
+% and further kron trickery to avoid the need to separate x and y from the
+% main decision variable
+prob.mats.bigDiffX = sparse([kron(prob.mats.bigDiff,[1 0]) zeros(size(prob.mats.bigDiff,1),1)]);
+prob.mats.bigDiffY = sparse([kron(prob.mats.bigDiff,[0 1]) zeros(size(prob.mats.bigDiff,1),1)]);
+prob.mats.bigDblDiffX = sparse([kron(prob.mats.bigDblDiff,[1 0]) zeros(size(prob.mats.bigDiff,1),1)]);
+prob.mats.bigDblDiffY = sparse([kron(prob.mats.bigDblDiff,[0 1]) zeros(size(prob.mats.bigDiff,1),1)]);
 
 %% initial guess
 
