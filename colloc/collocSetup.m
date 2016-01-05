@@ -9,10 +9,10 @@ maxSpeed = 1.0;
 maxTurn = 3.0;
 
 % initial configuration (x,y,theta)
-initConfig = [0 0 -2*pi/4];
+initConfig = [0 0 -0*2*pi/4];
 
 % final configuration
-termConfig = [1 1 1*pi/4];
+termConfig = [1 1 0*1*pi/4];
 
 % convert to z (output) and z-dot form
 initZ = initConfig(:,1:2)';
