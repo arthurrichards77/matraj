@@ -4,28 +4,33 @@ prob = shootSetup();
 
 res = fmincon(@(x)shoot1Cost(prob,x),prob.x0,[],[],[],[],prob.LB,prob.UB,@(x)shoot1Cons(prob,x));
 
-xres = shoot1(prob,res);
+xres = shoot1(prob,res,10);
+xres0 = shoot1(prob,prob.x0,10);
 
 plot(xres(1,:),xres(2,:),'.b-',...
-     prob.bcs.xInit(1),prob.bcs.xInit(2),'gs',...
-     prob.bcs.xTerm(1),prob.bcs.xTerm(2),'gx')
+     xres0(1,:),xres0(2,:),'.g-',...
+     prob.bcs.xInit(1),prob.bcs.xInit(2),'ms',...
+     prob.bcs.xTerm(1),prob.bcs.xTerm(2),'mx')
 axis equal
 
 end
 
 function prob = shootSetup
 
-prob.steps.nSteps = 20;
-prob.steps.dt = 0.1;
+prob.steps.nSteps = 5;
+prob.steps.dt = 0.4;
 
 prob.lims.maxTurn = 2.0;
 prob.lims.maxSpeed = 4.0;
 
 prob.bcs.xInit = [0;0;0*pi/3];
-prob.bcs.xTerm = [2.0;2.0;-5*pi/6];
+prob.bcs.xTerm = [2.0;2.0;5*pi/6];
+
+% initialise with turn to right angle but in wrong place
+turn0 = (prob.bcs.xTerm(3)-prob.bcs.xInit(3))/((0.5*prob.lims.maxSpeed)*prob.steps.nSteps*prob.steps.dt);
 
 prob.x0 = repmat([0.5*prob.lims.maxSpeed;
-             0*prob.lims.maxTurn], prob.steps.nSteps, 1);
+             turn0], prob.steps.nSteps, 1);
 
 prob.UB = repmat([prob.lims.maxSpeed;
                   prob.lims.maxTurn], prob.steps.nSteps, 1);
@@ -36,6 +41,7 @@ end
 
 function J = shoot1Cost(prob,x)
 
+% distance, by penalizing speed * time
 J = prob.steps.dt*sum(x(1:2:end));
 
 end
@@ -60,11 +66,20 @@ Ceq = [xs(1:2,end) - prob.bcs.xTerm(1:2);
 
 end
 
-function xs = shoot1(prob,us)
+function xs = shoot1(prob,us,nDec)
+
+%optional decimation for smoother views
+if ~exist('nDec'),
+    nDec = 1;
+end
+
+mydt = prob.steps.dt/nDec;
+mysteps = prob.steps.nSteps*nDec;
 
 xs(:,1) = prob.bcs.xInit;
-for kk=1:prob.steps.nSteps,
-    xs(:,kk+1) = f_rk4(xs(:,kk),us(2*(kk-1)+(1:2)),prob.steps.dt);
+for kk=1:mysteps,
+    myku = floor((kk-1)/nDec);
+    xs(:,kk+1) = f_rk4(xs(:,kk),us(2*myku+(1:2)),mydt);
 end
 
 end
