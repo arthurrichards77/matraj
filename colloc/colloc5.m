@@ -2,6 +2,11 @@
 % the equalities are all expressed as matrix equality constraints
 % now using symbolc gradient from Maple
 
+% ensure autodiff on path
+if ~exist('DecVar','class'),
+    addpath('../autodiff')
+end
+
 prob = collocSetup;
 
 %options = optimoptions('fmincon','MaxFunEvals',50000,'MaxIter',10000);
@@ -23,5 +28,5 @@ t3=toc
 [x0vals,y0vals] = collocTraj(prob,prob.x0);
 plot(xvals,yvals,'.b-', ...
      x0vals,y0vals,'.g-', ...
-     x(1:2:end-1),x(2:2:end-1),'xr:')
+     x(1:2:end-1),x(2:2:end-1),'xr:','LineWidth',2)
 axis equal

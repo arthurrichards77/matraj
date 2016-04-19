@@ -1,48 +1,84 @@
 function [res, xres] = shoot
+close all
 
 prob = shootSetup();
 
-res = fmincon(@(x)shoot1Cost(prob,x),prob.x0,[],[],[],[],prob.LB,prob.UB,@(x)shoot1Cons(prob,x));
+options = optimset('fmincon');
+options = optimset(options,'MaxFunEvals',10000);
+
+% run the optimizer
+tic
+res = fmincon(@(x)shoot1Cost(prob,x),prob.x0,[],[],[],[],prob.LB,prob.UB,@(x)shoot1Cons(prob,x),options);
+tShoot = toc
 
 xres = shoot1(prob,res,10);
 xres0 = shoot1(prob,prob.x0,10);
 
+% plot the path
+figure
 plot(xres(1,:),xres(2,:),'.b-',...
-     xres0(1,:),xres0(2,:),'.g-',...
      prob.bcs.xInit(1),prob.bcs.xInit(2),'ms',...
      prob.bcs.xTerm(1),prob.bcs.xTerm(2),'mx')
+% plot(xres(1,:),xres(2,:),'.b-',...
+%      xres0(1,:),xres0(2,:),'.g-',...
+%      prob.bcs.xInit(1),prob.bcs.xInit(2),'ms',...
+%      prob.bcs.xTerm(1),prob.bcs.xTerm(2),'mx')
 axis equal
+
+% plot time histories of control
+figure
+subplot 211
+stairs(linspace(0,res(1),prob.steps.nSteps),res(2:2:end),'LineWidth',2)
+axis([0 res(1) 0 prob.lims.maxSpeed*1.2])
+hold on
+plot([0 res(1)],[1 1]*prob.lims.maxSpeed,'r--')
+ylabel('Speed')
+subplot 212
+stairs(linspace(0,res(1),prob.steps.nSteps),res(3:2:end),'LineWidth',2)
+axis([0 res(1) prob.lims.maxTurn*[-1.2 1.2]])
+hold on
+plot([0 res(1)],[1 1]*prob.lims.maxTurn,'r--')
+plot([0 res(1)],-[1 1]*prob.lims.maxTurn,'r--')
+ylabel('Turn')
+xlabel('Time')
 
 end
 
 function prob = shootSetup
 
-prob.steps.nSteps = 5;
-prob.steps.dt = 0.4;
+prob.steps.nSteps = 8;
 
-prob.lims.maxTurn = 2.0;
-prob.lims.maxSpeed = 4.0;
+prob.lims.maxTurn = 3.0;
+prob.lims.maxSpeed = 1.0;
 
 prob.bcs.xInit = [0;0;0*pi/3];
-prob.bcs.xTerm = [2.0;2.0;5*pi/6];
+prob.bcs.xTerm = [1.0;1.0;-1*pi/4];
+prob.bcs.xTerm = [2.0;1.0;-2*pi/4];
+
+% initial guess of time
+T0 = 1.5;
 
 % initialise with turn to right angle but in wrong place
-turn0 = (prob.bcs.xTerm(3)-prob.bcs.xInit(3))/((0.5*prob.lims.maxSpeed)*prob.steps.nSteps*prob.steps.dt);
+turn0 = (prob.bcs.xTerm(3)-prob.bcs.xInit(3))/((prob.lims.maxSpeed)*T0);
 
-prob.x0 = repmat([0.5*prob.lims.maxSpeed;
-             turn0], prob.steps.nSteps, 1);
+% decision variable starts with time for whole
+prob.x0 = [T0;
+           repmat([prob.lims.maxSpeed;
+             turn0], prob.steps.nSteps, 1)];
 
-prob.UB = repmat([prob.lims.maxSpeed;
-                  prob.lims.maxTurn], prob.steps.nSteps, 1);
-prob.LB = repmat([ 0;
-                  -prob.lims.maxTurn], prob.steps.nSteps, 1);
+prob.UB = [inf;
+           repmat([prob.lims.maxSpeed;
+                  prob.lims.maxTurn], prob.steps.nSteps, 1)];
+prob.LB = [0;
+           repmat([ 0;
+                  -prob.lims.maxTurn], prob.steps.nSteps, 1)];
 
 end
 
 function J = shoot1Cost(prob,x)
 
-% distance, by penalizing speed * time
-J = prob.steps.dt*sum(x(1:2:end));
+% time
+J = x(1);
 
 end
 
@@ -66,14 +102,16 @@ Ceq = [xs(1:2,end) - prob.bcs.xTerm(1:2);
 
 end
 
-function xs = shoot1(prob,us,nDec)
+function xs = shoot1(prob,x,nDec)
 
 %optional decimation for smoother views
 if ~exist('nDec'),
     nDec = 1;
 end
 
-mydt = prob.steps.dt/nDec;
+dt = x(1)/prob.steps.nSteps;
+us = x(2:end);
+mydt = dt/nDec;
 mysteps = prob.steps.nSteps*nDec;
 
 xs(:,1) = prob.bcs.xInit;
